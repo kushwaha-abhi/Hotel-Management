@@ -1,8 +1,21 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { SIGNUP } from "../utils/API";
+import { toast } from "react-hot-toast";
 const Signup = () => {
   const [isPending, setPending] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loginData = localStorage.getItem("user");
+    setUser(loginData);
+  }, []);
+  if (user) {
+    navigate("/rooms");
+  }
+
   const [formData, setFormData] = useState({
     fullName: "",
     password: "",
@@ -16,12 +29,23 @@ const Signup = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setPending(true);
-    // Add your form submission logic here (e.g., API call)
-    console.log("Form Data:", formData);
-    setPending(false);
+    try {
+      const response = await axios.post(SIGNUP, formData);
+      if (response.status === 201) {
+        const user = JSON.stringify(response.data?.user);
+        localStorage.setItem("user", user);
+        toast.success(response.data.message);
+        navigate("/rooms");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
@@ -123,6 +147,7 @@ const Signup = () => {
               type="text"
               name="address"
               id="address"
+              required
               placeholder="Enter you Address"
               value={formData.address}
               onChange={handleChange}

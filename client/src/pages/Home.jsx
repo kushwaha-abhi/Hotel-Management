@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import RoomCard from "../components/RoomCard";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const rooms = [
@@ -9,6 +11,13 @@ const Home = () => {
     { roomNumber: 105, isAvailable: false, price: 4999 },
     { roomNumber: 106, isAvailable: true, price: 2999 },
   ];
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const loginData = localStorage.getItem("user");
+    setUser(loginData);
+    !loginData && navigate("/login");
+  }, []);
 
   return (
     <div className="min-h-[83vh] px-20 py-10">
