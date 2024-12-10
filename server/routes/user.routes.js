@@ -14,5 +14,6 @@ router.post('/login', [
 ], userController.login);
 
 router.post("/logout", userController.logout);
-router.post('/bookroom',authMiddleware.authUser,userController.bookRoom )
+
+
 module.exports= router;
