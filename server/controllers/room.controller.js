@@ -1,5 +1,6 @@
 const Room = require("../models/room.model");
 const BookedRoom = require("../models/bookedRoom.model");
+const roomModel= require('../models/room.model')
 module.exports.createRoom = async (req, res, next) => {
   const { roomNumber, available, roomPrice } = req.body;
 
@@ -84,14 +85,6 @@ module.exports.deleteRoom = async (req, res, next) => {
 // Booking room by the user
 
 module.exports.bookRoom = async (req, res) => {
-  upload.single("document")(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({
-        success: false,
-        message: err.message,
-      });
-    }
-
     const {
       name,
       age,
@@ -102,9 +95,10 @@ module.exports.bookRoom = async (req, res) => {
       amount,
       paymentMode,
       roomNumber,
+      documentURL
     } = req.body;
 
-    const documentURL = req.file ? `/uploads/${req.file.filename}` : null; // Save file path
+    // const documentURL = req.file ? `/uploads/${req.file.filename}` : null; // Save file path
 
     try {
       const room = await roomModel.findOne({ roomNumber });
@@ -179,8 +173,7 @@ module.exports.bookRoom = async (req, res) => {
         message: "Server error",
       });
     }
-  });
-};
+  };
 
 // find All rooms
 
