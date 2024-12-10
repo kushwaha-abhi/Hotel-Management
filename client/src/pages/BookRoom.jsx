@@ -1,19 +1,32 @@
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { formatPrice } from "../utils/currencyFormat";
 
 const BookRoom = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const data = localStorage.getItem("user");
+    const userData = JSON.parse(data);
+    setUser(userData);
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     age: "",
     documentType: "Aadhar",
     documentNumber: "",
     numberOfPeople: "",
-    paymentValue: "",
+    roomNumber: state?.roomNumber,
+    paymentValue: 0,
     checkInDate: "",
     checkOutDate: "",
     capturedImage: null,
+    paymentType: "",
   });
 
   const handleInputChange = (e) => {
@@ -33,18 +46,7 @@ const BookRoom = () => {
     e.preventDefault();
     console.log("Form Data Submitted:", formData);
     alert("Booking Successful!");
-    setFormData({
-      name: "",
-      age: "",
-      documentType: "Aadhar",
-      documentNumber: "",
-      numberOfPeople: "",
-      paymentValue: "",
-      checkInDate: "",
-      checkOutDate: "",
-      capturedImage: null,
-    });
-    navigate("/rooms");
+    navigate("/transactions");
   };
 
   return (
@@ -136,7 +138,9 @@ const BookRoom = () => {
               className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               <option value="Aadhar">Aadhar</option>
-              <option value="DL">DL</option>
+              <option value="DL" disabled>
+                DL
+              </option>
             </select>
           </div>
           <div>
@@ -174,19 +178,36 @@ const BookRoom = () => {
           )}
         </div>
 
-        {/* Payment Value */}
-        <div>
-          <label className="block text-gray-600 font-medium mb-1">
-            Payment Value
-          </label>
-          <input
-            type="number"
-            name="paymentValue"
-            value={formData.paymentValue}
-            onChange={handleInputChange}
-            required
-            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+        {/* Payment */}
+        <div className="grid grid-cols-2 justify-between ">
+          <div className="w-4/5">
+            <label className="block text-gray-600 font-medium mb-1">
+              Payment Value
+            </label>
+
+            <div
+              className="w-full border border-gray-300 p-2 rounded
+            focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              {formatPrice(state.price)}
+            </div>
+          </div>
+          <div className="self-end">
+            <label className="block text-gray-600 font-medium mb-1">
+              Payment Type
+            </label>
+            <select
+              name="paymentType"
+              id="paymentType"
+              onChange={handleInputChange}
+              className="border w-3/5 px-4 py-2"
+            >
+              <option value="cash">Cash</option>
+              <option value="upi" disabled>
+                UPI
+              </option>
+            </select>
+          </div>
         </div>
 
         {/* Submit Button */}
