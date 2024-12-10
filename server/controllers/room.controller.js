@@ -1,4 +1,3 @@
-
 const Room = require("../models/room.model");
 
 module.exports.createRoom = async (req, res, next) => {
@@ -28,7 +27,7 @@ module.exports.createRoom = async (req, res, next) => {
       available: available ?? true, // Default to true if not provided
       roomPrice,
     });
-     
+
     await room.save();
 
     // Respond with success
@@ -46,9 +45,7 @@ module.exports.createRoom = async (req, res, next) => {
   }
 };
 
-
-// delete a room 
-
+// delete a room
 
 module.exports.deleteRoom = async (req, res, next) => {
   const { roomId } = req.params; // Assume roomId is passed as a URL parameter

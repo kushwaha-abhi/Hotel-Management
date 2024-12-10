@@ -2,7 +2,8 @@ const userModel = require("../models/user.model");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const BookedRoom = require("../models/bookedRoom.model");
-const roomModel= require("../models/room.model")
+const roomModel = require("../models/room.model");
+
 module.exports.register = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -10,7 +11,7 @@ module.exports.register = async (req, res, next) => {
   }
 
   const { fullName, email, password, address, phoneNumber } = req.body;
-
+  console.log(fullName, email, password, address, phoneNumber);
   // Check if required fields are provided
   if (!fullName || !email || !password || !phoneNumber || !address) {
     return res.status(400).json({
@@ -34,20 +35,22 @@ module.exports.register = async (req, res, next) => {
 
     // Create the user
     const user = await userModel.create({
-      fullName, 
+      fullName,
       email,
       password: hashedPassword,
       address,
       phoneNumber,
     });
 
+    // Generate authentication token
     const token = user.generateAuthToken();
-
+    res.cookie("token", token);
     // Respond with success
     res.status(201).json({
       success: true,
-      message: "You are registered successfully",
+      message: "You are registered",
       token,
+      user,
     });
   } catch (error) {
     console.error("Error in registerUser:", error.message);
@@ -102,6 +105,7 @@ module.exports.login = async (req, res, next) => {
       success: true,
       message: "Logged in successfully",
       token,
+      user,
     });
   } catch (error) {
     console.error("Error in login:", error.message);
@@ -112,7 +116,7 @@ module.exports.login = async (req, res, next) => {
   }
 };
 
-// Logout 
+// Logout
 
 module.exports.logout = async (req, res, next) => {
   try {
@@ -132,10 +136,9 @@ module.exports.logout = async (req, res, next) => {
   }
 };
 
+// Booking room by the user
 
-// Booking room by the user 
-
-module.exports.bookRoom= async (req, res) => {
+module.exports.bookRoom = async (req, res) => {
   const {
     name,
     age,
@@ -150,12 +153,12 @@ module.exports.bookRoom= async (req, res) => {
   } = req.body;
 
   try {
-        const room= roomModel.findOne({roomNumber});
-        if(!room.available){
-          res.status(400).json({
-            message:"room is not available",
-          })
-        }
+    const room = roomModel.findOne({ roomNumber });
+    if (!room.available) {
+      res.status(400).json({
+        message: "room is not available",
+      });
+    }
     // Validate the required fields
     if (!checkIn || !checkOut) {
       return res.status(400).json({
@@ -191,8 +194,11 @@ module.exports.bookRoom= async (req, res) => {
       paymentMode,
       roomNumber,
     });
-     
-    const updatedroom = await roomModel.findOneAndUpdate({ roomNumber },  { $set: { available:false } });
+
+    const updatedroom = await roomModel.findOneAndUpdate(
+      { roomNumber },
+      { $set: { available: false } }
+    );
 
     if (!updatedroom) {
       return res.status(400).json({
@@ -200,7 +206,7 @@ module.exports.bookRoom= async (req, res) => {
         message: "You have entered the wrong room number",
       });
     }
-      await room.save();
+    await room.save();
     // Save the booking to the database
     const savedBooking = await bookedRoom.save();
 
@@ -217,5 +223,3 @@ module.exports.bookRoom= async (req, res) => {
     });
   }
 };
-
-
