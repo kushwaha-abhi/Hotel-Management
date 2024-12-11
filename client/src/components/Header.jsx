@@ -21,7 +21,7 @@ const Header = () => {
   return (
     <header className={`bg-indigo-600 text-white p-4 shadow-md`}>
       <div className="container mx-auto flex items-center justify-between">
-        <Link to={"/rooms"} className="flex items-center space-x-2">
+        <Link to={"/"} className="flex items-center space-x-2">
           <div className="bg-white rounded-full w-10 h-10 flex items-center justify-center">
             <span className="text-indigo-600 font-bold text-lg">🏨</span>
           </div>

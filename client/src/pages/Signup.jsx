@@ -13,7 +13,7 @@ const Signup = () => {
     setUser(loginData);
   }, []);
   if (user) {
-    navigate("/rooms");
+    navigate("/");
   }
 
   const [formData, setFormData] = useState({
@@ -38,7 +38,7 @@ const Signup = () => {
         const user = JSON.stringify(response.data?.user);
         localStorage.setItem("user", user);
         toast.success(response.data.message);
-        navigate("/rooms");
+        navigate("/");
       }
     } catch (error) {
       console.log(error);

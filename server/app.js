@@ -8,26 +8,11 @@ const userRoutes = require("./routes/user.routes");
 const roomRoutes = require("./routes/room.routes");
 const cloudinary = require("cloudinary").v2;
 
+app.use(cors());
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const allowedOrigins = [
-  "https://hotel-management-ten-self.vercel.app",
-  process.env.FRONTEND_URL,
-];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,

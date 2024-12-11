@@ -13,7 +13,7 @@ const Login = () => {
     setUser(loginData);
   }, []);
   if (user) {
-    navigate("/rooms");
+    navigate("/");
   }
   const [isPending, setPending] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,18 +30,16 @@ const Login = () => {
     e.preventDefault();
     setPending(true);
     try {
-      const response = await axios.post(LOGIN, formData, {
-        withCredentials: true,
-      });
+      const response = await axios.post(LOGIN, formData);
       if (response.status === 200) {
         const user = JSON.stringify(response.data?.user);
         localStorage.setItem("user", user);
         toast.success(response.data.message);
-        navigate("/rooms");
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
-      toast.error(error?.response?.data?.message);
+      toast.error(error?.message);
     } finally {
       setPending(false);
     }
