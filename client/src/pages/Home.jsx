@@ -31,8 +31,14 @@ const Home = () => {
   //   }, []);
   if (rooms.length === 0) {
     return (
-      <div className="min-h-[83vh] text-center text-2xl pt-24">
+      <div className="min-h-[83vh] grid place-items-center text-2xl pt-24">
         No Rooms are Available
+        <Link
+          to={"/createroom"}
+          className="bg-indigo-600 py-2 px-5 rounded mt-5 text-white"
+        >
+          Creae a Room
+        </Link>
       </div>
     );
   }

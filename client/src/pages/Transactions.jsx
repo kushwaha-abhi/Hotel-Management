@@ -49,7 +49,7 @@ const Transactions = () => {
         >
           <div className="md:block hidden">{index + 1}</div>
           <div>{booking.name}</div>
-          <div>{booking.roomNo}</div>
+          <div>{booking.roomNumber}</div>
           <div>{booking.numberOfDays}</div>
           <div>{booking.numberOfPeople}</div>
           <div>{booking.amount}</div>

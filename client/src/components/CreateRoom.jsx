@@ -4,7 +4,7 @@ import { CREATE_ROOM } from "../utils/API";
 import toast from "react-hot-toast";
 
 function CreateRoom() {
-  const [roomNumber, setRoomNumber] = useState("");
+  const [roomNumber, setRoomNumber] = useState();
   const [available, setAvailable] = useState(true);
   const [roomPrice, setRoomPrice] = useState("");
 
@@ -40,7 +40,7 @@ function CreateRoom() {
             Room Number
           </label>
           <input
-            type="text"
+            type="number"
             id="roomNumber"
             value={roomNumber}
             onChange={(e) => setRoomNumber(e.target.value)}

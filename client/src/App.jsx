@@ -16,7 +16,7 @@ function App() {
       <Toaster />
       <Header />
       <Routes>
-        <Route path="/rooms" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/createroom" element={<CreateRoom />} />
         <Route path="/room/:id" element={<BookRoom />} />
