@@ -11,17 +11,28 @@ const cloudinary = require("cloudinary").v2;
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const allowedOrigins = [
+  "https://hotel-management-ten-self.vercel.app",
+  process.env.FRONTEND_URL,
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
 cloudinary.config({
-  cloud_name: "dav7trp4i",
-  api_key: "343991673178556",
-  api_secret: "hO22EEIBUVazO_RHQbfm2FQpH1k", // Click 'View API Keys' above to copy your API secret
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
 
 connectToBb();
