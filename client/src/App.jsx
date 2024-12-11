@@ -8,6 +8,7 @@ import PageNotFound from "./components/PageNotFound";
 import BookRoom from "./pages/BookRoom";
 import Transactions from "./pages/Transactions";
 import { Toaster } from "react-hot-toast";
+import CreateRoom from "./components/CreateRoom";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/rooms" element={<Home />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/createroom" element={<CreateRoom />} />
         <Route path="/room/:id" element={<BookRoom />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />

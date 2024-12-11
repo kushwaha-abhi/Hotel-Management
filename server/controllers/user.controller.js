@@ -2,9 +2,9 @@ const userModel = require("../models/user.model");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const BookedRoom = require("../models/bookedRoom.model");
-const roomModel= require("../models/room.model")
-const multer = require("multer");
-const { upload } = require('../uploads/multerConfig');
+const roomModel = require("../models/room.model");
+// const multer = require("multer");
+// const { upload } = require("../uploads/multerConfig");
 
 module.exports.register = async (req, res, next) => {
   const errors = validationResult(req);
@@ -46,7 +46,7 @@ module.exports.register = async (req, res, next) => {
 
     // Generate authentication token
     const token = user.generateAuthToken();
-    res.cookie("token", token);
+    res.cookie("token", token, { httpOnly: true });
     // Respond with success
     res.status(201).json({
       success: true,
@@ -101,7 +101,7 @@ module.exports.login = async (req, res, next) => {
 
     // Generate authentication token
     const token = user.generateAuthToken();
-    res.cookie("token", token);
+    res.cookie("token", token, { httpOnly: true });
     // Respond with success
     res.status(200).json({
       success: true,

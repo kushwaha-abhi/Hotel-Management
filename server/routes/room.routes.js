@@ -1,12 +1,14 @@
-const express= require("express");
-const router= express.Router();
-const authMiddleware= require("../middleware/auth.middleware")
-const roomController= require('../controllers/room.controller')
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/auth.middleware");
+const roomController = require("../controllers/room.controller");
+const upload = require("../middleware/multer")("upload");
+// const uploadMiddleware = require("./uploadMiddleware");
 
-router.post('/add', authMiddleware.authUser,roomController.createRoom);
-router.delete('/delete/:roomId', authMiddleware.authUser, roomController.deleteRoom);
-router.post('/bookroom',authMiddleware.authUser,roomController.bookRoom );
-router.get('/getall',authMiddleware.authUser,roomController.getAllRooms);
-router.get('/bookings',authMiddleware.authUser,roomController.getAllBookings);
+router.post("/add", roomController.createRoom);
+router.delete("/delete/:roomId", roomController.deleteRoom);
+router.post("/bookroom", upload.single("image"), roomController.bookRoom);
+router.get("/getall", roomController.getAllRooms);
+router.get("/bookings", roomController.getAllBookings);
 
-module.exports= router
+module.exports = router;

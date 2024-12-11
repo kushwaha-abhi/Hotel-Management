@@ -1,6 +1,7 @@
 const Room = require("../models/room.model");
 const BookedRoom = require("../models/bookedRoom.model");
-const roomModel= require('../models/room.model')
+const roomModel = require("../models/room.model");
+
 module.exports.createRoom = async (req, res, next) => {
   const { roomNumber, available, roomPrice } = req.body;
 
@@ -85,95 +86,101 @@ module.exports.deleteRoom = async (req, res, next) => {
 // Booking room by the user
 
 module.exports.bookRoom = async (req, res) => {
-    const {
+  const {
+    name,
+    age,
+    checkIn,
+    checkOut,
+    numberOfPeople,
+    documentNumber,
+    amount,
+    paymentMode,
+    roomNumber,
+  } = req.body;
+
+  // Access the uploaded file
+  const image = req.file;
+
+  // if (!image) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, message: "Document is required" });
+  // }
+
+  try {
+    const room = await roomModel.findOne({ roomNumber });
+    if (!room || !room.available) {
+      return res.status(400).json({
+        success: false,
+        message: "Room is not available",
+      });
+    }
+
+    // Validate the required fields
+    if (!checkIn || !checkOut) {
+      return res.status(400).json({
+        success: false,
+        message: "Check-in and check-out dates are required.",
+      });
+    }
+
+    // Calculate the number of days
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    if (checkOutDate <= checkInDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Check-out date must be after the check-in date.",
+      });
+    }
+
+    const timeDiff = checkOutDate - checkInDate;
+    const numberOfDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+    // Create a new booking
+    const bookedRoom = new BookedRoom({
       name,
       age,
-      checkIn,
-      checkOut,
+      numberOfDays,
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
       numberOfPeople,
       documentNumber,
+      // documentURL: image?.path || "",
       amount,
       paymentMode,
       roomNumber,
-      documentURL
-    } = req.body;
+    });
 
-    // const documentURL = req.file ? `/uploads/${req.file.filename}` : null; // Save file path
+    // Update the room status
+    const updatedRoom = await roomModel.findOneAndUpdate(
+      { roomNumber },
+      { $set: { available: false } }
+    );
 
-    try {
-      const room = await roomModel.findOne({ roomNumber });
-      if (!room || !room.available) {
-        return res.status(400).json({
-          success: false,
-          message: "Room is not available",
-        });
-      }
-
-      // Validate the required fields
-      if (!checkIn || !checkOut) {
-        return res.status(400).json({
-          success: false,
-          message: "Check-in and check-out dates are required.",
-        });
-      }
-
-      // Calculate the number of days
-      const checkInDate = new Date(checkIn);
-      const checkOutDate = new Date(checkOut);
-      if (checkOutDate <= checkInDate) {
-        return res.status(400).json({
-          success: false,
-          message: "Check-out date must be after the check-in date.",
-        });
-      }
-
-      const timeDiff = checkOutDate - checkInDate;
-      const numberOfDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-      // Create a new booking
-      const bookedRoom = new BookedRoom({
-        name,
-        age,
-        numberOfDays,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        numberOfPeople,
-        documentNumber,
-        documentURL,
-        amount,
-        paymentMode,
-        roomNumber,
-      });
-
-      // Update the room status
-      const updatedRoom = await roomModel.findOneAndUpdate(
-        { roomNumber },
-        { $set: { available: false } }
-      );
-
-      if (!updatedRoom) {
-        return res.status(400).json({
-          success: false,
-          message: "You have entered the wrong room number",
-        });
-      }
-
-      // Save the booking to the database
-      const savedBooking = await bookedRoom.save();
-
-      res.status(201).json({
-        success: true,
-        message: "Room booked successfully",
-        booking: savedBooking,
-      });
-    } catch (error) {
-      console.error("Error booking room:", error.message);
-      res.status(500).json({
+    if (!updatedRoom) {
+      return res.status(400).json({
         success: false,
-        message: "Server error",
+        message: "You have entered the wrong room number",
       });
     }
-  };
+
+    // Save the booking to the database
+    const savedBooking = await bookedRoom.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Room booked successfully",
+      booking: savedBooking,
+    });
+  } catch (error) {
+    console.error("Error booking room:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
 
 // find All rooms
 
@@ -216,6 +223,7 @@ module.exports.getAllBookings = async (req, res) => {
         date: 1,
         numberOfDays: 1,
         _id: 0,
+        bookedAt: 1,
       }
     );
 
