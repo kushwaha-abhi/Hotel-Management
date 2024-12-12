@@ -1,10 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdLogIn } from "react-icons/io";
 import { BiLogOutCircle } from "react-icons/bi";
+import { RxHamburgerMenu } from "react-icons/rx";
 import { useEffect, useState } from "react";
 
 const Header = () => {
   const [user, setUser] = useState(null);
+  const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,6 +16,7 @@ const Header = () => {
   }, []);
 
   const handleLogout = () => {
+    setMenu(false);
     localStorage.removeItem("user");
     navigate("/login");
   };
@@ -40,27 +43,53 @@ const Header = () => {
             <h1 className="text-2xl font-bold">Book Your Room</h1>
           )}
         </div>
-
-        {/* Login/Logout Button */}
-        <div>
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="flex items-center bg-white px-4 py-2 rounded-sm text-red-600 font-medium gap-2"
-            >
-              <span className="hidden sm:inline text-lg">Logout</span>
-              <IoMdLogIn size={23} color="red" />
+        {
+          <div className="relative">
+            <button onClick={() => setMenu(!menu)}>
+              <RxHamburgerMenu size={28} />
             </button>
-          ) : (
-            <Link
-              to={"/login"}
-              className="flex items-center justify-center gap-2 text-xl"
+            <div
+              className={`bg-white w-40 rounded-md p-4 text-black absolute right-12 flex-col text-lg gap-4 ${
+                menu ? "flex" : "hidden"
+              }`}
             >
-              <span className="hidden sm:inline text-lg">Login</span>
-              <BiLogOutCircle size={25} />
-            </Link>
-          )}
-        </div>
+              <Link
+                onClick={() => setMenu(false)}
+                to={"/transactions"}
+                className="hover:bg-slate-200 px-3"
+              >
+                Transactions
+              </Link>
+              <Link
+                onClick={() => setMenu(false)}
+                to={"/createroom"}
+                className="hover:bg-slate-200 px-3"
+              >
+                Create Room
+              </Link>
+              <div className="">
+                {user ? (
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center bg-white px-4 py-2 rounded-sm text-red-600 font-medium gap-2"
+                  >
+                    <span className="text-lg">Logout</span>
+                    <IoMdLogIn size={23} color="red" />
+                  </button>
+                ) : (
+                  <Link
+                    onClick={() => setMenu(false)}
+                    to={"/login"}
+                    className="flex items-center justify-center gap-2 text-xl"
+                  >
+                    <span className="text-lg">Login</span>
+                    <BiLogOutCircle size={25} />
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        }
       </div>
     </header>
   );

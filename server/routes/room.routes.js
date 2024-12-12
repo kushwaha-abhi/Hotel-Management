@@ -7,6 +7,7 @@ const upload = require("../middleware/multer")("upload");
 
 router.post("/add", roomController.createRoom);
 router.delete("/delete/:roomId", roomController.deleteRoom);
+router.put("/cancel/:roomNumber", roomController.cancelRoom);
 router.post("/bookroom", upload.single("image"), roomController.bookRoom);
 router.get("/getall", roomController.getAllRooms);
 router.get("/bookings", roomController.getAllBookings);

@@ -83,6 +83,47 @@ module.exports.deleteRoom = async (req, res, next) => {
   }
 };
 
+module.exports.cancelRoom = async (req, res, next) => {
+  const { roomNumber } = req.params; // Assume roomId is passed as a URL parameter
+
+  if (!roomNumber) {
+    return res.status(400).json({
+      success: false,
+      message: "Room ID is required",
+    });
+  }
+
+  try {
+    // Find and delete the room by ID
+    const cancelRoom = await Room.findOneAndUpdate(
+      { roomNumber },
+      {
+        available: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!cancelRoom) {
+      return res.status(404).json({
+        success: false,
+        message: "Room not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Room Cancelled",
+    });
+  } catch (error) {
+    console.error("Error in deleteRoom:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 // Booking room by the user
 
 module.exports.bookRoom = async (req, res) => {
