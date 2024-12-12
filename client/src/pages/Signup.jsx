@@ -19,6 +19,7 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     password: "",
+    password1: "",
     email: "",
     phoneNumber: "",
     address: "",
@@ -42,10 +43,12 @@ const Signup = () => {
       }
     } catch (error) {
       console.log(error);
-      if (error?.response?.data?.message) {
-        toast.error(error?.response?.data?.message);
+      if (error?.status === 400) {
+        toast.error("User already exists");
+      } else if (error?.status === 401) {
+        toast.error("Confirm Password doesn't Matched");
       } else {
-        toast.error(error?.message);
+        toast.error("Internal Server Error");
       }
     } finally {
       setPending(false);
@@ -114,7 +117,25 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Enter your password"
+              placeholder="Enter your password (Must be 8 Characters)"
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="password1"
+              id="password1"
+              value={formData.password1}
+              onChange={handleChange}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Re-Enter your Password"
               required
             />
           </div>

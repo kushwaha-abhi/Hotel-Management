@@ -40,7 +40,7 @@ const Header = () => {
               Welcome, <span className="font-bold ">{user.fullName}</span>
             </p>
           ) : (
-            <h1 className="text-2xl font-bold">Book Your Room</h1>
+            <h1 className="text-xl md:text-2xl font-bold">Book Your Room</h1>
           )}
         </div>
         {
@@ -49,10 +49,17 @@ const Header = () => {
               <RxHamburgerMenu size={28} />
             </button>
             <div
-              className={`bg-white w-40 rounded-md p-4 text-black absolute right-12 flex-col text-lg gap-4 ${
+              className={`bg-white w-40 z-20 rounded-md p-4 text-black absolute right-12 flex-col text-lg gap-4 ${
                 menu ? "flex" : "hidden"
               }`}
             >
+              <Link
+                onClick={() => setMenu(false)}
+                to={"/"}
+                className="hover:bg-slate-200 px-3"
+              >
+                Home
+              </Link>
               <Link
                 onClick={() => setMenu(false)}
                 to={"/transactions"}
