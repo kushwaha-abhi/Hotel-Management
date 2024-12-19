@@ -8,5 +8,6 @@ router.delete('/delete/:roomId', authMiddleware.authUser, roomController.deleteR
 router.post('/bookroom',authMiddleware.authUser,roomController.bookRoom );
 router.get('/getall',authMiddleware.authUser,roomController.getAllRooms);
 router.get('/bookings',authMiddleware.authUser,roomController.getAllBookings);
-
+router.put('/cancelBooking', roomController.cancelBooking);
+router.put('/checkOut',roomController.checkoutRoom );
 module.exports= router
