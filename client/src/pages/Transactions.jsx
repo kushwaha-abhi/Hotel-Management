@@ -1,6 +1,26 @@
-import { bookings } from "../utils/constant";
+import axios from "axios";
+// import { bookings } from "../utils/constant";
+import { TRANSACTIONS } from "../utils/API";
+import { useEffect, useState } from "react";
+import { formatDate } from "../utils/dateFormat";
+import toast from "react-hot-toast";
 
 const Transactions = () => {
+  const [bookings, setBookings] = useState([]);
+  const getBookings = async () => {
+    try {
+      const response = await axios.get(TRANSACTIONS);
+      setBookings(response.data.data);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message);
+    }
+  };
+
+  useEffect(() => {
+    getBookings();
+  }, []);
+
   if (bookings.length === 0) {
     return (
       <div className="grid min-h-[83vh] place-items-center text-3xl font-medium">
@@ -29,12 +49,12 @@ const Transactions = () => {
         >
           <div className="md:block hidden">{index + 1}</div>
           <div>{booking.name}</div>
-          <div>{booking.roomNo}</div>
-          <div>{booking.days}</div>
-          <div>{booking.people}</div>
+          <div>{booking.roomNumber}</div>
+          <div>{booking.numberOfDays}</div>
+          <div>{booking.numberOfPeople}</div>
           <div>{booking.amount}</div>
           <div>{booking.paymentMode}</div>
-          <div>{booking.date}</div>
+          <div>{formatDate(booking.bookedAt)}</div>
         </div>
       ))}
       <div className="mt-4 flex items-end">

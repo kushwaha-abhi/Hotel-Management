@@ -1,20 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { formatPrice } from "../utils/currencyFormat";
+import axios from "axios";
+import { BOOK_ROOM } from "../utils/API";
+import toast from "react-hot-toast";
 
 const BookRoom = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const data = localStorage.getItem("user");
-    const userData = JSON.parse(data);
-    setUser(userData);
-  }, []);
-
+  const [document, setDocument] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -22,11 +18,11 @@ const BookRoom = () => {
     documentNumber: "",
     numberOfPeople: "",
     roomNumber: state?.roomNumber,
-    paymentValue: 0,
-    checkInDate: "",
-    checkOutDate: "",
-    capturedImage: null,
-    paymentType: "",
+    amount: state?.price,
+    checkIn: "",
+    checkOut: "",
+    // image: null,
+    paymentMode: "Cash",
   });
 
   const handleInputChange = (e) => {
@@ -34,19 +30,47 @@ const BookRoom = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleImageCapture = (e) => {
+  // const handleImageCapture = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const imageUrl = URL.createObjectURL(file);
+  //     setFormData({ ...formData, image: imageUrl });
+  //   }
+  // };
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setFormData({ ...formData, capturedImage: imageUrl });
+      setDocument(imageUrl);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-    alert("Booking Successful!");
-    navigate("/transactions");
+    if (!document) {
+      alert("Please upload a document.");
+      return;
+    }
+
+    try {
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => {
+        data.append(key, formData[key]);
+      });
+      data.append("image", document);
+      const response = await axios.post(BOOK_ROOM, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (response.status === 201) {
+        toast.success(response.data.message);
+        navigate("/transactions");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message);
+    }
   };
 
   return (
@@ -103,8 +127,8 @@ const BookRoom = () => {
             </label>
             <input
               type="date"
-              name="checkInDate"
-              value={formData.checkInDate}
+              name="checkIn"
+              value={formData.checkIn}
               onChange={handleInputChange}
               required
               className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -116,8 +140,8 @@ const BookRoom = () => {
             </label>
             <input
               type="date"
-              name="checkOutDate"
-              value={formData.checkOutDate}
+              name="checkOut"
+              value={formData.checkOut}
               onChange={handleInputChange}
               required
               className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -166,15 +190,11 @@ const BookRoom = () => {
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageCapture}
+            onChange={handleFileChange}
             className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          {formData.capturedImage && (
-            <img
-              src={formData.capturedImage}
-              alt="Captured"
-              className="mt-4 max-w-sm"
-            />
+          {document && (
+            <img src={document} alt="Captured" className="mt-4 max-w-sm" />
           )}
         </div>
 
@@ -197,8 +217,8 @@ const BookRoom = () => {
               Payment Type
             </label>
             <select
-              name="paymentType"
-              id="paymentType"
+              name="paymentMode"
+              id="paymentMode"
               onChange={handleInputChange}
               className="border w-3/5 px-4 py-2"
             >

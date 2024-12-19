@@ -4,19 +4,28 @@ const bcrypt = require("bcrypt");
 const BookedRoom = require("../models/bookedRoom.model");
 const roomModel= require("../models/room.model")
 
+
 module.exports.register = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
 
-  const { fullName, email, password, address, phoneNumber } = req.body;
+  const { fullName, email, password, password1, address, phoneNumber } =
+    req.body;
   console.log(fullName, email, password, address, phoneNumber);
   // Check if required fields are provided
   if (!fullName || !email || !password || !phoneNumber || !address) {
     return res.status(400).json({
       success: false,
       message: "All fields are required (fullname, email, and password)",
+    });
+  }
+
+  if (password !== password1) {
+    return res.status(401).json({
+      success: false,
+      message: "Confirm Password doesn't Matched",
     });
   }
 
@@ -44,7 +53,7 @@ module.exports.register = async (req, res, next) => {
 
     // Generate authentication token
     const token = user.generateAuthToken();
-    res.cookie("token", token);
+    res.cookie("token", token, { httpOnly: true });
     // Respond with success
     res.status(201).json({
       success: true,
@@ -99,7 +108,7 @@ module.exports.login = async (req, res, next) => {
 
     // Generate authentication token
     const token = user.generateAuthToken();
-    res.cookie("token", token);
+    res.cookie("token", token, { httpOnly: true });
     // Respond with success
     res.status(200).json({
       success: true,

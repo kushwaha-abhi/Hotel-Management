@@ -11,7 +11,7 @@ const PageNotFound = () => {
         The page you are looking for doesn&apos;t exist or has been moved.
       </p>
       <Link
-        to="/rooms"
+        to="/"
         className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded shadow"
       >
         Go Back to Homepage
