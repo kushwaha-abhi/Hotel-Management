@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatPrice } from "../utils/currencyFormat";
-import { CHECKOUT } from "../utils/API";
+import { API, CHECKOUT } from "../utils/API";
 
 const CheckOut = () => {
   const navigate = useNavigate();
@@ -13,10 +13,9 @@ const CheckOut = () => {
 
   useEffect(() => {
     const fetchBookedRoomData = async () => {
+      const GET_BOOKED_DATA = API + "/room/" + id + "/booked-data";
       try {
-        const response = await axios.get(
-          `http://localhost:3000/room/${id}/booked-data`
-        );
+        const response = await axios.get(GET_BOOKED_DATA);
         if (response.data.success) {
           const booking = response.data.booking;
           setFormData(booking);
