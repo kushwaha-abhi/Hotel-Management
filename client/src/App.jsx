@@ -9,6 +9,7 @@ import BookRoom from "./pages/BookRoom";
 import Transactions from "./pages/Transactions";
 import { Toaster } from "react-hot-toast";
 import CreateRoom from "./components/CreateRoom";
+import CheckOut from "./pages/CheckOut";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/checkout/:id" element={<CheckOut />} />
         <Route path="/createroom" element={<CreateRoom />} />
         <Route path="/room/:id" element={<BookRoom />} />
         <Route path="/signup" element={<Signup />} />

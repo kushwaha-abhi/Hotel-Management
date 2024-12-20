@@ -1,9 +1,6 @@
 const userModel = require("../models/user.model");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const BookedRoom = require("../models/bookedRoom.model");
-const roomModel= require("../models/room.model")
-
 
 module.exports.register = async (req, res, next) => {
   const errors = validationResult(req);
@@ -144,5 +141,3 @@ module.exports.logout = async (req, res, next) => {
     });
   }
 };
-
-

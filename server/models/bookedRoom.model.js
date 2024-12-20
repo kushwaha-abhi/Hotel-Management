@@ -3,15 +3,15 @@ const mongoose = require("mongoose");
 const bookedRoomSchema = new mongoose.Schema({
   name: {
     type: String,
-    trim: true, 
+    trim: true,
   },
   age: {
     type: Number,
-    min: 0, 
+    min: 0,
   },
   numberOfDays: {
     type: Number,
-    min: 1, 
+    min: 1,
   },
   checkIn: {
     type: Date,
@@ -21,11 +21,11 @@ const bookedRoomSchema = new mongoose.Schema({
   },
   numberOfPeople: {
     type: Number,
-    min: 1, 
+    min: 1,
   },
   documentNumber: {
     type: String,
-    trim: true, 
+    trim: true,
   },
   documentURL: {
     type: String,
@@ -38,32 +38,35 @@ const bookedRoomSchema = new mongoose.Schema({
   },
   totalAmount: {
     type: Number,
-    min: 0, 
+    min: 0,
   },
   checkInAmount: {
     type: Number,
-    min: 0, 
+    min: 0,
   },
   checkOutAmount: {
     type: Number,
-    min: 0, 
+    min: 0,
   },
-   remainAmount: {
+  remainAmount: {
     type: Number,
-    min: 0, 
+    min: 0,
   },
   paymentMode: {
     type: String,
-    enum: ["Cash", "Card", "UPI", "Net Banking"], 
+    enum: ["Cash", "Card", "UPI", "Net Banking"],
   },
   roomNumber: {
     type: String,
     trim: true,
   },
-  bookedAt:{
-    type:Date,
-    default:Date.now(),
-  }
+  bookedAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  roomId: {
+    type: mongoose.Schema.ObjectId,
+  },
 });
 
 module.exports = mongoose.model("BookedRoom", bookedRoomSchema);
