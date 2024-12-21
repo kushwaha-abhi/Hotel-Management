@@ -3,6 +3,7 @@ const router= express.Router();
 const {body}= require("express-validator");
 const userController = require("../controllers/user.controller");
 const authMiddleware= require("../middleware/auth.middleware")
+
 router.post('/register',[
     body("email").isEmail().withMessage("Invalid email"),
     body("password").isLength({min:5}).withMessage("password should be minimum 6 figures")
