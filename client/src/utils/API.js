@@ -8,3 +8,4 @@ export const CANCEL_ROOM = API + "/room/cancel/:roomId";
 export const BOOK_ROOM = API + "/room/bookroom";
 export const TRANSACTIONS = API + "/room/bookings";
 export const CHECKOUT = API + "/room/checkOut";
+export const DOWNLOAD_CSV = API + "/room/csvFile";

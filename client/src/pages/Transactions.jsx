@@ -1,6 +1,6 @@
 import axios from "axios";
 // import { bookings } from "../utils/constant";
-import { TRANSACTIONS } from "../utils/API";
+import { DOWNLOAD_CSV, TRANSACTIONS } from "../utils/API";
 import { useEffect, useState } from "react";
 import { formatDate } from "../utils/dateFormat";
 import toast from "react-hot-toast";
@@ -15,6 +15,29 @@ const Transactions = () => {
     } catch (error) {
       console.log(error);
       toast.error(error?.response?.data?.message);
+    }
+  };
+
+  const handleDownload = async () => {
+    try {
+      // Make a request to the backend endpoint
+      const response = await axios.get(DOWNLOAD_CSV, {
+        responseType: "blob", // Important to handle the file data
+      });
+
+      // Create a URL for the blob and trigger a download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "bookings.csv"); // Set the file name
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading the file:", error);
+      alert("Failed to download the file.");
     }
   };
 
@@ -71,7 +94,10 @@ const Transactions = () => {
         </div>
       ))}
       <div className="mt-4 flex items-end">
-        <button className="bg-indigo-600 py-2 px-4 rounded-md text-white font-medium">
+        <button
+          className="bg-indigo-600 py-2 px-4 rounded-md text-white font-medium"
+          onClick={handleDownload}
+        >
           Download CSV
         </button>
       </div>
