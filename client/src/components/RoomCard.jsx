@@ -4,12 +4,15 @@ import { imgSrc } from "../utils/constant";
 import axios from "axios";
 import { API } from "../utils/API";
 import toast from "react-hot-toast";
+import useCustom from "../utils/useCustom";
 
-const RoomCard = ({ roomNumber, isAvailable, price, user }) => {
+const RoomCard = ({ roomNumber, isAvailable, price, roomId, user }) => {
   const navigate = useNavigate();
+  const { getRooms } = useCustom();
   const handleBook = () => {
     if (!user) navigate("/login");
-    else navigate(`/room/${roomNumber}`, { state: { roomNumber, price } });
+    else
+      navigate(`/room/${roomNumber}`, { state: { roomNumber, price, roomId } });
   };
 
   const handleCancel = async () => {
@@ -18,6 +21,7 @@ const RoomCard = ({ roomNumber, isAvailable, price, user }) => {
       const response = await axios.put(CANCEL_ROOM);
       if (response.status === 200) {
         toast.success(response?.data?.message);
+        getRooms();
       }
     } catch (error) {
       if (error?.response?.data?.message) {
@@ -54,12 +58,24 @@ const RoomCard = ({ roomNumber, isAvailable, price, user }) => {
             Book Now
           </button>
         ) : (
-          <button
-            className="bg-red-600 text-white font-medium py-2 px-4 rounded"
-            onClick={handleCancel}
-          >
-            Cancel Now
-          </button>
+          <div className="flex justify-between">
+            <button
+              className="bg-red-600 text-white font-medium py-2 px-4 rounded"
+              onClick={handleCancel}
+            >
+              Cancel Now
+            </button>
+            <button
+              className="bg-green-600 text-white font-medium py-2 px-4 rounded"
+              onClick={() => {
+                navigate(`/checkout/${roomNumber}`, {
+                  state: { roomNumber, price },
+                });
+              }}
+            >
+              Check Out
+            </button>
+          </div>
         )}
       </div>
     </div>

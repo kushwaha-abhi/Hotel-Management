@@ -4,7 +4,7 @@ export function formatDate(dateString) {
 
   // Get the day, month, and year
   const day = date.getDate();
-  const month = date.toLocaleString("en-IN", { month: "long" });
+  const month = date.toLocaleString("en-IN", { month: "short" });
   const year = date.getFullYear();
 
   // Format and return the result

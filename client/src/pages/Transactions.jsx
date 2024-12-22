@@ -4,6 +4,7 @@ import { TRANSACTIONS } from "../utils/API";
 import { useEffect, useState } from "react";
 import { formatDate } from "../utils/dateFormat";
 import toast from "react-hot-toast";
+import { formatPrice } from "../utils/currencyFormat";
 
 const Transactions = () => {
   const [bookings, setBookings] = useState([]);
@@ -30,29 +31,41 @@ const Transactions = () => {
   }
   return (
     <div className="py-8 px-6 min-h-[83vh] overflow-auto  border">
-      <h2 className="text-2xl font-bold mb-4">Booking Details</h2>
-      <div className="grid grid-cols-8 gap-4 bg-gray-100 text-gray-700 font-semibold p-2 py-3 rounded-md md:w-full w-[150%] overflow-x-auto">
+      <h2 className="md:text-2xl text-xl font-bold mb-4">Booking Details</h2>
+      <div className="grid md:text-base text-sm grid-cols-10 gap-4 bg-gray-100 text-gray-700 font-semibold p-2 py-3 rounded-md md:w-full w-[150%] overflow-x-auto">
         <div className="md:block hidden">S. No.</div>
         <div>Name</div>
         <div>Room No.</div>
         <div>No. of Days</div>
         <div>No. of People</div>
-        <div>Amount</div>
+        <div className="text-sm">CheckIn Amount</div>
+        <div className="text-sm">CheckOut Amount</div>
+        <div className="text-sm">Total Amount</div>
         <div>Payment Mode</div>
         <div>Date</div>
       </div>
 
       {bookings.map((booking, index) => (
         <div
-          key={booking.id}
-          className="grid grid-cols-8 gap-4 p-3 border-b border-gray-300 hover:bg-slate-100 text-sm md:text-base md:w-full w-[150%] overflow-x-auto"
+          key={booking._id}
+          className="grid grid-cols-10  md:text-base text-sm  gap-4 p-3 border-b border-gray-300 hover:bg-slate-100 md:w-full w-[150%] overflow-x-auto"
         >
           <div className="md:block hidden">{index + 1}</div>
           <div>{booking.name}</div>
           <div>{booking.roomNumber}</div>
           <div>{booking.numberOfDays}</div>
           <div>{booking.numberOfPeople}</div>
-          <div>{booking.amount}</div>
+          <div>{formatPrice(booking.checkInAmount)}</div>
+          <div>
+            {booking.checkOutAmount
+              ? formatPrice(booking.checkOutAmount)
+              : formatPrice(0)}
+          </div>
+          <div>
+            {booking.checkOutAmount
+              ? formatPrice(booking.checkInAmount + booking.checkOutAmount)
+              : formatPrice(booking.checkInAmount)}
+          </div>
           <div>{booking.paymentMode}</div>
           <div>{formatDate(booking.bookedAt)}</div>
         </div>

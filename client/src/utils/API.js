@@ -7,3 +7,4 @@ export const CREATE_ROOM = API + "/room/add";
 export const CANCEL_ROOM = API + "/room/cancel/:roomId";
 export const BOOK_ROOM = API + "/room/bookroom";
 export const TRANSACTIONS = API + "/room/bookings";
+export const CHECKOUT = API + "/room/checkOut";

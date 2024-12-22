@@ -4,28 +4,8 @@ import { Link } from "react-router-dom";
 import useCustom from "../utils/useCustom";
 
 const Home = () => {
-  // const [rooms, setRooms] = useState([]);
   const [user, setUser] = useState(null);
-  // const [isLoading, setLoading] = useState(false);
   const { rooms, isLoading } = useCustom();
-  // const getRooms = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await axios.get(GET_ALL_ROOM);
-  //     setRooms(response.data?.data);
-  //     setLoading(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //     if (error?.message) {
-  //       toast.error(error.message);
-  //     } else {
-  //       toast.error(error?.response?.data?.message);
-  //     }
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   useEffect(() => {
     const loginData = localStorage.getItem("user");
     setUser(loginData);
@@ -33,7 +13,7 @@ const Home = () => {
 
   if (isLoading) {
     return <div className="text-3xl mt-20">Loading...</div>;
-  } else if (rooms.length === 0) {
+  } else if (rooms?.length === 0) {
     return (
       <div className="min-h-[83vh] grid place-items-center text-2xl pt-24">
         No Rooms are Available
@@ -55,6 +35,7 @@ const Home = () => {
             roomNumber={room.roomNumber}
             isAvailable={room.available}
             price={room.roomPrice}
+            roomId={room._id}
             user={user}
           />
         ))}
@@ -63,7 +44,7 @@ const Home = () => {
         to={"/createroom"}
         className="bg-indigo-600 py-2 px-5 rounded mt-5 text-white"
       >
-        Creae a Room
+        Create a Room
       </Link>
     </div>
   );

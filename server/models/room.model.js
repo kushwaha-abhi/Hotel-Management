@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// Define the schema
 const roomSchema = new mongoose.Schema(
   {
     roomNumber: {
@@ -15,19 +14,21 @@ const roomSchema = new mongoose.Schema(
     },
     bedCount: {
       type: Number,
-      required:true,
-      min: 1
+      // required:true,
+      min: 1,
     },
     roomPrice: {
       type: Number,
       required: true,
       min: 0,
     },
+    currentBookingId: {
+      type: mongoose.Schema.ObjectId,
+    },
   },
   { timestamps: true }
 );
 
-// Create the model
 const Room = mongoose.model("Room", roomSchema);
 
 module.exports = Room;

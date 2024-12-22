@@ -1,75 +1,49 @@
-import { useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { formatPrice } from "../utils/currencyFormat";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { BOOK_ROOM } from "../utils/API";
 import toast from "react-hot-toast";
+import { formatPrice } from "../utils/currencyFormat";
+import { API, CHECKOUT } from "../utils/API";
 
-const BookRoom = () => {
-  const params = useParams();
+const CheckOut = () => {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const { id } = useParams();
+  const [checkOutAmount, setChekOutAmount] = useState();
+  const [formData, setFormData] = useState("");
 
-  let bookedRoom = [];
-  const [document, setDocument] = useState(null);
-  const [formData, setFormData] = useState({
-    roomId: state?.roomId,
-    name: "",
-    age: "",
-    documentType: "Aadhar",
-    documentNumber: "",
-    numberOfPeople: "",
-    roomNumber: state?.roomNumber,
-    checkInAmount: Math.floor(state?.price / 2),
-    totalAmount: state?.price,
-    checkIn: "",
-    checkOut: "",
-    // image: null,
-    paymentMode: "Cash",
-  });
+  useEffect(() => {
+    const fetchBookedRoomData = async () => {
+      const GET_BOOKED_DATA = API + "/room/" + id + "/booked-data";
+      try {
+        const response = await axios.get(GET_BOOKED_DATA);
+        if (response.data.success) {
+          const booking = response.data.booking;
+          setFormData(booking);
+        } else {
+          toast.error(response.data.message);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to fetch room data.");
+      }
+    };
+
+    fetchBookedRoomData();
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // const handleImageCapture = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const imageUrl = URL.createObjectURL(file);
-  //     setFormData({ ...formData, image: imageUrl });
-  //   }
-  // };
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setDocument(imageUrl);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!document) {
-      alert("Please upload a document.");
-      return;
-    }
-
     try {
-      const data = new FormData();
-      Object.keys(formData).forEach((key) => {
-        data.append(key, formData[key]);
+      const response = await axios.put(CHECKOUT, {
+        roomNumber: id,
+        checkOutAmount,
       });
-      data.append("image", document);
-      const response = await axios.post(BOOK_ROOM, data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      if (response.status === 201) {
-        console.log(response.data);
-        bookedRoom.push(response.data?.booking?._id);
-        localStorage.setItem("bookedRoom", bookedRoom);
+      if (response.status === 200) {
         toast.success(response.data.message);
         navigate("/transactions");
       }
@@ -82,7 +56,7 @@ const BookRoom = () => {
   return (
     <div className="max-w-2xl mx-auto bg-white p-8 shadow-md rounded-md mt-8">
       <h1 className="text-2xl font-semibold mb-6 text-gray-800">
-        Booking Form for Room No. {params.id}
+        Check Out Form for Room No. {id}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -90,9 +64,10 @@ const BookRoom = () => {
           <input
             type="text"
             name="name"
-            value={formData.name}
+            value={formData?.name}
             onChange={handleInputChange}
             required
+            disabled
             className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
@@ -103,8 +78,9 @@ const BookRoom = () => {
           <input
             type="number"
             name="age"
-            value={formData.age}
+            value={formData?.age}
             onChange={handleInputChange}
+            disabled
             required
             className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -118,7 +94,8 @@ const BookRoom = () => {
           <input
             type="number"
             name="numberOfPeople"
-            value={formData.numberOfPeople}
+            value={formData?.numberOfPeople}
+            disabled
             onChange={handleInputChange}
             required
             className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -134,7 +111,8 @@ const BookRoom = () => {
             <input
               type="date"
               name="checkIn"
-              value={formData.checkIn}
+              value={formData?.checkIn?.split("T")[0]}
+              disabled
               onChange={handleInputChange}
               required
               className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -147,61 +125,13 @@ const BookRoom = () => {
             <input
               type="date"
               name="checkOut"
-              value={formData.checkOut}
+              value={formData?.checkOut?.split("T")[0]}
+              disabled
               onChange={handleInputChange}
               required
               className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-        </div>
-
-        {/* Document Type and Number */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-600 font-medium mb-1">
-              Document Type
-            </label>
-            <select
-              name="documentType"
-              value={formData.documentType}
-              onChange={handleInputChange}
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="Aadhar">Aadhar</option>
-              <option value="DL" disabled>
-                DL
-              </option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-gray-600 font-medium mb-1">
-              Document Number
-            </label>
-            <input
-              type="text"
-              name="documentNumber"
-              value={formData.documentNumber}
-              onChange={handleInputChange}
-              required
-              className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-        </div>
-
-        {/* Image Capture */}
-        <div>
-          <label className="block text-gray-600 font-medium mb-1">
-            Capture Document
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          {document && (
-            <img src={document} alt="Captured" className="mt-4 max-w-sm" />
-          )}
         </div>
 
         {/* Payment */}
@@ -210,17 +140,23 @@ const BookRoom = () => {
             <label className="block text-gray-600 font-medium mb-1">
               Payment Value
             </label>
-            <div className="my-2">
-              Total Amount: {formatPrice(state?.price)}
+            <div className="text-sm mt-2">
+              Total : {formatPrice(formData?.totalAmount)}
+            </div>
+            <div className="text-sm text-green-600">
+              Paid Amount : {formatPrice(formData?.checkInAmount)}
+            </div>
+            <div className="text-sm text-red-600 mb-2">
+              Remaining Amount : {formatPrice(formData?.checkInAmount)}
             </div>
             <input
               name="amount"
               id="amount"
               type="number"
-              value={formData.checkInAmount}
-              onChange={handleInputChange}
+              value={checkOutAmount}
+              onChange={(e) => setChekOutAmount(e.target.value)}
               className="w-full border border-gray-300 p-2 rounded
-            focus:outline-none focus:ring-2 focus:ring-blue-400"
+                 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
           <div className="self-end">
@@ -231,6 +167,7 @@ const BookRoom = () => {
               name="paymentMode"
               id="paymentMode"
               onChange={handleInputChange}
+              disabled
               className="border w-3/5 px-4 py-2"
             >
               <option value="cash">Cash</option>
@@ -246,11 +183,11 @@ const BookRoom = () => {
           type="submit"
           className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
         >
-          Book
+          Check Out
         </button>
       </form>
     </div>
   );
 };
 
-export default BookRoom;
+export default CheckOut;
