@@ -303,7 +303,7 @@ module.exports.cancelBooking = async (req, res, next) => {
 
 module.exports.checkoutRoom = async (req, res, next) => {
   try {
-    const { roomNumber, checkOutAmount } = req.body;
+    const { roomNumber, checkOutAmount, paymentMode } = req.body;
 
     // Fetch the room to verify it exists and is booked
     const room = await Room.findOne({ roomNumber });
@@ -335,7 +335,8 @@ module.exports.checkoutRoom = async (req, res, next) => {
     const updatedBookedRoom = await BookedRoom.findByIdAndUpdate(
       room.currentBookingId,
       {
-        $set: { checkOutAmount, status: "Checked Out" }, // Added status for clarity
+        $set: { checkOutAmount, status: "Checked Out" },
+        $set: { checkOutAmount, paymentMode },
         $inc: { remainAmount: -checkOutAmount },
       },
       { new: true }

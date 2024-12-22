@@ -9,6 +9,7 @@ const CheckOut = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [checkOutAmount, setChekOutAmount] = useState();
+  const [paymentMode, setpaymentMode] = useState("Cash");
   const [formData, setFormData] = useState("");
 
   useEffect(() => {
@@ -42,6 +43,7 @@ const CheckOut = () => {
       const response = await axios.put(CHECKOUT, {
         roomNumber: id,
         checkOutAmount,
+        paymentMode,
       });
       if (response.status === 200) {
         toast.success(response.data.message);
@@ -51,6 +53,7 @@ const CheckOut = () => {
       console.log(error);
       toast.error(error?.response?.data?.message);
     }
+    console.log(paymentMode);
   };
 
   return (
@@ -147,13 +150,14 @@ const CheckOut = () => {
               Paid Amount : {formatPrice(formData?.checkInAmount)}
             </div>
             <div className="text-sm text-red-600 mb-2">
-              Remaining Amount : {formatPrice(formData?.checkInAmount)}
+              Remaining Amount : {formatPrice(formData?.remainAmount)}
             </div>
             <input
               name="amount"
               id="amount"
               type="number"
               value={checkOutAmount}
+              required
               onChange={(e) => setChekOutAmount(e.target.value)}
               className="w-full border border-gray-300 p-2 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -166,14 +170,12 @@ const CheckOut = () => {
             <select
               name="paymentMode"
               id="paymentMode"
-              onChange={handleInputChange}
-              disabled
+              value={paymentMode}
+              onChange={(e) => setpaymentMode(e.target.value)}
               className="border w-3/5 px-4 py-2"
             >
-              <option value="cash">Cash</option>
-              <option value="upi" disabled>
-                UPI
-              </option>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
             </select>
           </div>
         </div>
