@@ -1,10 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { formatPrice } from "../utils/currencyFormat";
+import { Link, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { imgSrc } from "../utils/constant";
 import axios from "axios";
 import { API } from "../utils/API";
 import toast from "react-hot-toast";
 import useCustom from "../utils/useCustom";
+import { formatPrice } from "../utils/dayCounter";
 
 const RoomCard = ({ roomNumber, isAvailable, price, roomId, user }) => {
   const navigate = useNavigate();
@@ -65,21 +66,25 @@ const RoomCard = ({ roomNumber, isAvailable, price, roomId, user }) => {
             >
               Cancel Now
             </button>
-            <button
+            <Link
               className="bg-green-600 text-white font-medium py-2 px-4 rounded"
-              onClick={() => {
-                navigate(`/checkout/${roomNumber}`, {
-                  state: { roomNumber, price },
-                });
-              }}
+              to={`/checkout/${roomNumber}`}
+              state={(roomNumber, price)}
             >
               Check Out
-            </button>
+            </Link>
           </div>
         )}
       </div>
     </div>
   );
+};
+RoomCard.propTypes = {
+  roomNumber: PropTypes.number.isRequired,
+  isAvailable: PropTypes.bool.isRequired,
+  price: PropTypes.number.isRequired,
+  roomId: PropTypes.string.isRequired,
+  user: PropTypes.string,
 };
 
 export default RoomCard;

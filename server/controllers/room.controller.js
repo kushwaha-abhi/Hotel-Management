@@ -1,6 +1,7 @@
 const Room = require("../models/room.model");
 const BookedRoom = require("../models/bookedRoom.model");
 const roomModel = require("../models/room.model");
+const mongoose = require("mongoose");
 
 module.exports.createRoom = async (req, res, next) => {
   const { roomNumber, available, roomPrice, bedCount } = req.body;
@@ -136,16 +137,17 @@ module.exports.bookRoom = async (req, res) => {
     totalAmount,
     paymentMode,
     roomNumber,
-    // documentURL,
   } = req.body;
 
-  // Calculate the remaining amount to be paid
-  const remainAmount = totalAmount - checkInAmount;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
     // Fetch the room details
-    const room = await roomModel.findOne({ roomNumber });
+    const room = await roomModel.findOne({ roomNumber }).session(session);
     if (!room || !room.available) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Room is not available.",
@@ -154,6 +156,8 @@ module.exports.bookRoom = async (req, res) => {
 
     // Validate the required fields
     if (!checkIn || !checkOut) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Check-in and check-out dates are required.",
@@ -164,6 +168,8 @@ module.exports.bookRoom = async (req, res) => {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
     if (checkOutDate <= checkInDate) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Check-out date must be after the check-in date.",
@@ -175,11 +181,16 @@ module.exports.bookRoom = async (req, res) => {
 
     // Validate check-in amount
     if (checkInAmount < 0) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Invalid check-in amount.",
       });
     }
+
+    // Calculate the remaining amount to be paid
+    const remainAmount = totalAmount - checkInAmount;
 
     // Create a new booking
     const bookedRoom = new BookedRoom({
@@ -191,7 +202,6 @@ module.exports.bookRoom = async (req, res) => {
       checkOut: checkOutDate,
       numberOfPeople,
       documentNumber,
-      // documentURL,
       checkInAmount,
       totalAmount,
       remainAmount,
@@ -199,22 +209,27 @@ module.exports.bookRoom = async (req, res) => {
       roomNumber,
     });
 
+    // Save the booking to the database
+    const savedBooking = await bookedRoom.save({ session });
+
     // Update the room status
     const updatedRoom = await roomModel.findOneAndUpdate(
       { roomNumber },
-      { $set: { available: false, currentBookingId: bookedRoom._id } }, // Added `currentBookingId` to link booking
-      { new: true }
+      { $set: { available: false, currentBookingId: savedBooking._id } },
+      { new: true, session }
     );
 
     if (!updatedRoom) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Invalid room number provided.",
       });
     }
 
-    // Save the booking to the database
-    const savedBooking = await bookedRoom.save();
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(201).json({
       success: true,
@@ -222,6 +237,8 @@ module.exports.bookRoom = async (req, res) => {
       booking: savedBooking,
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     console.error("Error booking room:", error.message);
     res.status(500).json({
       success: false,

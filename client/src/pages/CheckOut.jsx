@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { formatPrice } from "../utils/currencyFormat";
 import { API, CHECKOUT } from "../utils/API";
+import { formatPrice } from "../utils/dayCounter";
 
 const CheckOut = () => {
   const navigate = useNavigate();

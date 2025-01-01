@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { formatPrice } from "../utils/currencyFormat";
 import axios from "axios";
 import { BOOK_ROOM } from "../utils/API";
 import toast from "react-hot-toast";
+import { dayCounter, formatPrice } from "../utils/dayCounter";
 
 const BookRoom = () => {
   const params = useParams();
@@ -11,6 +11,8 @@ const BookRoom = () => {
   const { state } = useLocation();
 
   let bookedRoom = [];
+
+  const [totalAmount, setTotalAmount] = useState(0);
   const [document, setDocument] = useState(null);
   const [formData, setFormData] = useState({
     roomId: state?.roomId,
@@ -20,8 +22,8 @@ const BookRoom = () => {
     documentNumber: "",
     numberOfPeople: "",
     roomNumber: state?.roomNumber,
-    checkInAmount: Math.floor(state?.price / 2),
-    totalAmount: state?.price,
+    checkInAmount: Math.floor(totalAmount / 2),
+    totalAmount,
     checkIn: "",
     checkOut: "",
     // image: null,
@@ -47,6 +49,17 @@ const BookRoom = () => {
       setDocument(imageUrl);
     }
   };
+
+  useEffect(() => {
+    const day = dayCounter(formData.checkIn, formData.checkOut);
+    const price = day * (state?.price || 0);
+    setTotalAmount(price);
+    setFormData((prev) => ({
+      ...prev,
+      checkInAmount: Math.floor(totalAmount / 2),
+      totalAmount,
+    }));
+  }, [formData.checkIn, state, formData.checkOut, totalAmount]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -211,7 +224,7 @@ const BookRoom = () => {
               Payment Value
             </label>
             <div className="my-2">
-              Total Amount: {formatPrice(state?.price)}
+              Total Amount: {formatPrice(totalAmount || state?.price)}
             </div>
             <input
               name="amount"
@@ -233,10 +246,8 @@ const BookRoom = () => {
               onChange={handleInputChange}
               className="border w-3/5 px-4 py-2"
             >
-              <option value="cash">Cash</option>
-              <option value="upi" disabled>
-                UPI
-              </option>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
             </select>
           </div>
         </div>

@@ -2,9 +2,8 @@ import axios from "axios";
 // import { bookings } from "../utils/constant";
 import { DOWNLOAD_CSV, TRANSACTIONS } from "../utils/API";
 import { useEffect, useState } from "react";
-import { formatDate } from "../utils/dateFormat";
 import toast from "react-hot-toast";
-import { formatPrice } from "../utils/currencyFormat";
+import { formatDate, formatPrice } from "../utils/dayCounter";
 
 const Transactions = () => {
   const [bookings, setBookings] = useState([]);
