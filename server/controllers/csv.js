@@ -2,6 +2,8 @@ const { Parser } = require("json2csv");
 const BookedRoom = require("../models/bookedRoom.model");
 
 module.exports.downloadFile = async (req, res) => {
+  const { fromDate, toDate } = req.body;
+
   try {
     let bookings = await BookedRoom.find(
       {},
@@ -19,6 +21,19 @@ module.exports.downloadFile = async (req, res) => {
         _id: 0,
       }
     );
+
+    if (fromDate !== null || toDate !== null) {
+      bookings = bookings.filter(
+        (b) =>
+          b.bookedAt.toISOString().split("T")[0] >= fromDate &&
+          b.bookedAt.toISOString().split("T")[0] <= toDate
+      );
+      if (bookings.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "Data is not available, Change the date" });
+      }
+    }
 
     bookings = bookings.map((booking) => ({
       ...booking._doc,
@@ -47,8 +62,7 @@ module.exports.downloadFile = async (req, res) => {
     const json2csvParser = new Parser({ fields });
     const csv = json2csvParser.parse(bookings);
 
-    // Set headers for CSV download
-    res.setHeader("Content-Disposition", "attachment; filename=bookings.csv");
+    res.setHeader("Content-Disposition", "attachment; filename=Bookings.csv");
     res.setHeader("Content-Type", "text/csv");
 
     res.status(200).send(csv);
